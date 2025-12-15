@@ -5,34 +5,24 @@ export default function ContactForm() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState("");
 
-  // Old line: const res = await fetch("http://localhost:5000/api/contact", { ...
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus("Sending...");
 
-// NEW CODE:
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setStatus("Sending...");
+    // Logic: Use the Environment variable, but fallback to localhost if it's missing
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const endpoint = `${baseUrl}/api/contact`;
 
-  // 1. Get the base URL from our environment file
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL; 
-  
-  // 2. Combine it with the specific endpoint
-  // Result will be "http://localhost:5000/api/contact" locally
-  // Or "https://your-backend.vercel.app/api/contact" in production
-  const endpoint = `${baseUrl}/api/contact`;
-
-  try {
-    const res = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-    
-    // ... rest of your code (if (res.ok) ...)
-
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
       if (res.ok) {
         setStatus("Message Sent!");
-        setFormData({ name: "", email: "", message: "" });
+        setFormData({ name: "", email: "", message: "" }); // Clear form on success
       } else {
         setStatus("Error sending message.");
       }
